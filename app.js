@@ -10,9 +10,9 @@ app.use(express.urlencoded({ extended: true }));
 
 const router = express.Router();
 //Rotas
-const index = require('./routes');
-const osRoute = require('./routes/OsUtilRouter');
-const whatsRoute = require('./routes/whatsRoute');
+const index = require('./src/routes');
+const osRoute = require('./src/routes/OsUtilRouter');
+const whatsRoute = require('./src/routes/whatsRoute');
 app.use('/', index);
 app.use('/os', osRoute);
 app.use('/whats', whatsRoute);
