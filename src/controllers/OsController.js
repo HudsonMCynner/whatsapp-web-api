@@ -2,13 +2,6 @@ var osu = require('node-os-utils')
 var cpu = osu.cpu
 var mem = osu.mem
 
-// exports.connect = (req, res, next) => {
-//   rcon.connect()
-//     .then(() => {
-//       res.status(200).send('Conectado');
-//     })
-// };
-
 exports.cpuUsage = (req, res, next) => {
   cpu.usage()
     .then(cpuPercentage => {
