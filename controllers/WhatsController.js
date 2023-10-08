@@ -13,14 +13,10 @@ const client = new Client({
 client.on('qr', qr => {
   qrcode.generate(qr, {small: true});
 });
-
-const contatos = ['556791307481']
-const remetente = '5567992026705'
 //verifica se o whats está conectado
 
 exports.enviarMensagem = (req, res, next) => {
-  const numeros = req.body.numeros
-  const mensagem = req.body.mensagem
+  const { numeros, mensagem } = req.body
 
   if (Array.isArray(numeros)) {
     numeros.forEach((numero) => {
@@ -31,11 +27,28 @@ exports.enviarMensagem = (req, res, next) => {
   }
 }
 
-exports.buscarContatos = async (req, res, next) => {
-  const contacts = await client.getContacts()
-  res.status(200).send(contacts);
+exports.buscarContatos = (req, res, next) => {
+  client.getContacts()
+    .then((contatos) => {
+      res.status(200).send(contatos)
+    })
+    .catch((e) => {
+      console.log('~> Erro ao buscar contatos', e)
+      res.status(400).send(e)
+    })
 }
 
+
+exports.buscarGrupos =  (req, res, next) => {
+  client.getContacts()
+    .then((contatos) => {
+      res.status(200).send(contatos.filter((contato) => contato.isGroup))
+    })
+    .catch((e) => {
+      console.log('~> Erro ao buscar contatos', e)
+      res.status(400).send(e)
+    })
+}
 
 // Sending message.
 function enviarMensagem (number, text) {
@@ -51,75 +64,45 @@ function enviarMensagem (number, text) {
 }
 
 client.on('ready', async () => {
-  // const contacts = await client.getContacts()
-  // console.table(contacts)
-  console.log('Client is ready!');
+  console.log('~> Cliente Online')
+});
 
-  // // Number and Text.
-  // var number = "+55.67.9.9130.7481";
-  // var text = "Teste!";
-  //
-  // //Cleaning to only numbers
-  // number = number.replace(/\D/g, "");
-  // //console.log(number);
-  //
-  // //Remove Contry Code (Brazil 55) to make it more simple
-  // if (Array.from(number)[0] == "5" && Array.from(number)[1] == "5" && number.length > 11) {
-  //   number = number.substring(2);
-  //   //console.log(number);
-  // }
-  // else {
-  //   number = number;
-  //   //console.log(number);
-  // }
-  //
-  // //Removing 0 from beggin (In Brazil old people put that)
-  // if (Array.from(number)[0] == "0") {
-  //   number = number.substring(1);
-  //   //console.log(number);
-  // }
-  // else {
-  //   number = number;
-  //   //console.log(number);
-  // }
-  //
-  // //Creating two numbers (In Brazil we change recentily to 11 digits, put one 9 more)
-  // var number2 = "";
-  // if (number && /^\d{11,}$/.test(number.trim())) {
-  //   //console.log('Tem 11');
-  //   number2 = number.slice(0, 2) + number.slice(3);
-  //   //console.log(number2);
-  // }
-  // else if (number && /^\d{10,}$/.test(number.trim())) {
-  //   //console.log('Tem 10');
-  //   number2 = number.slice(0, 2) + "9" + number.slice(2);
-  //   //console.log(number2);
-  // }
-  // else {
-  //   console.log('Não Tem 11 ou 10');
-  // }
-  //
-  // //Add Brazil code (55) and whatsapp ending
-  // number = "55" + number + "@c.us";
-  // number2 = "55" + number2 + "@c.us";
-  // //console.log(number);
-  // //console.log(number2);
-  // var number_array = [number, number2]
-  // number_array.forEach(element => console.log(element));
-  //
-  //
-  //
-  // contatos.forEach(number => {
-  //   enviarMensagem(number.includes('@c.us') ? number : `${number}@c.us`, text)
-  // });
+client.on('authenticated', async () => {
+  console.log('~> Cliente Autenticado')
+});
+
+client.on('disconnected', async () => {
+  console.log('~> Cliente Desconectado')
 });
 
 
-//teste if script is working. User send !ping e script return pong
-client.on('message', msg => {
-  if (msg.body == '!ping') {
-    msg.reply('pong');
+client.on('message_create', async msg => {
+  if (msg.body === '!todos') { // mensionar todos em um grupo
+    const chat = await msg.getChat();
+    let text = "teste";
+    let mentions = [];
+    for (let participant of chat.participants) {
+      const contact = await client.getContactById(participant.id._serialized);
+      mentions.push(contact);
+      text += `@${participant.id.user} `;
+    }
+    await chat.sendMessage(text, { mentions });
   }
+});
+
+
+client.on('message', async msg => {
+  // if (msg.body === '!todos') { // mensionar todos em um grupo
+  //   const chat = await msg.getChat();
+  //   let text = "teste";
+  //   let mentions = [];
+  //   for (let participant of chat.participants) {
+  //     const contact = await client.getContactById(participant.id._serialized);
+  //     mentions.push(contact);
+  //     text += `@${participant.id.user} `;
+  //   }
+  //   await chat.sendMessage(text, { mentions });
+  // }
 });
 
 client.initialize();
