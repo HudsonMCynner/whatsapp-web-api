@@ -13,14 +13,10 @@ const client = new Client({
 client.on('qr', qr => {
   qrcode.generate(qr, {small: true});
 });
-
-const contatos = ['556791307481']
-const remetente = '5567992026705'
 //verifica se o whats está conectado
 
 exports.enviarMensagem = (req, res, next) => {
-  const numeros = req.body.numeros
-  const mensagem = req.body.mensagem
+  const { numeros, mensagem } = req.body
 
   if (Array.isArray(numeros)) {
     numeros.forEach((numero) => {
