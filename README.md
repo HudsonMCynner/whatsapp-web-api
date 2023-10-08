@@ -40,7 +40,13 @@ body: {
 #### Busca de Contatos
 ```sh
 GET: http://localhost:3000/whats/contatos
-200-OK (Retorna no corpo de resposta uma lista de contatos vinculados ao cliente autenticado)
+200-OK (Retorna no corpo de resposta uma lista de contatos vinculados)
+```
+
+#### Busca de Grupos
+```sh
+GET: http://localhost:3000/whats/grupos
+200-OK (Retorna no corpo de resposta uma lista de grupos)
 ```
 
 ## License
