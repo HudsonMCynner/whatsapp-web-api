@@ -1,19 +1,19 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-// parse application/x-www-form-urlencoded
-// For parsing application/json
 app.use(express.json());
-
-// For parsing application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 const router = express.Router();
 //Rotas
 const index = require('./src/routes');
+const auth = require('./src/routes/AuthRoute');
 const osRoute = require('./src/routes/OsUtilRouter');
 const whatsRoute = require('./src/routes/whatsRoute');
+
 app.use('/', index);
+app.use('/auth', auth);
 app.use('/os', osRoute);
 app.use('/whats', whatsRoute);
 module.exports = app;

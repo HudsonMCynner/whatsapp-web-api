@@ -3,9 +3,8 @@ const qrcode = require('qrcode-terminal');
 
 //chamando a lib do chatbot
 const { Client, LocalAuth } = require('whatsapp-web.js');
-
 //guarda o whats na variavel client
-const client = new Client({
+let client = new Client({
   authStrategy: new LocalAuth()
 });
 
@@ -13,7 +12,51 @@ const client = new Client({
 client.on('qr', qr => {
   qrcode.generate(qr, {small: true});
 });
-//verifica se o whats está conectado
+
+client.on('ready', async () => {
+  console.log('~> Cliente Online')
+});
+
+client.on('authenticated', async () => {
+  console.log('~> Cliente Autenticado')
+});
+
+client.on('disconnected', async () => {
+  console.log('~> Cliente Desconectado')
+});
+
+client.on('message_create', async msg => {
+  if (msg.body === '!todos') { // mensionar todos em um grupo
+    const chat = await msg.getChat();
+    let text = "teste";
+    let mentions = [];
+    for (let participant of chat.participants) {
+      const contact = await client.getContactById(participant.id._serialized);
+      mentions.push(contact);
+      text += `@${participant.id.user} `;
+    }
+    await chat.sendMessage(text, { mentions });
+  }
+});
+
+client.on('message', async msg => {
+  // if (msg.body === '!todos') { // mensionar todos em um grupo
+  //   const chat = await msg.getChat();
+  //   let text = "teste";
+  //   let mentions = [];
+  //   for (let participant of chat.participants) {
+  //     const contact = await client.getContactById(participant.id._serialized);
+  //     mentions.push(contact);
+  //     text += `@${participant.id.user} `;
+  //   }
+  //   await chat.sendMessage(text, { mentions });
+  // }
+});
+
+
+exports.inicializar = () => {
+  return client.initialize();
+}
 
 exports.enviarMensagem = (req, res, next) => {
   const { numeros, mensagem } = req.body
@@ -38,7 +81,6 @@ exports.buscarContatos = (req, res, next) => {
     })
 }
 
-
 exports.buscarGrupos =  (req, res, next) => {
   client.getContacts()
     .then((contatos) => {
@@ -62,47 +104,3 @@ function enviarMensagem (number, text) {
     }
   })
 }
-
-client.on('ready', async () => {
-  console.log('~> Cliente Online')
-});
-
-client.on('authenticated', async () => {
-  console.log('~> Cliente Autenticado')
-});
-
-client.on('disconnected', async () => {
-  console.log('~> Cliente Desconectado')
-});
-
-
-client.on('message_create', async msg => {
-  if (msg.body === '!todos') { // mensionar todos em um grupo
-    const chat = await msg.getChat();
-    let text = "teste";
-    let mentions = [];
-    for (let participant of chat.participants) {
-      const contact = await client.getContactById(participant.id._serialized);
-      mentions.push(contact);
-      text += `@${participant.id.user} `;
-    }
-    await chat.sendMessage(text, { mentions });
-  }
-});
-
-
-client.on('message', async msg => {
-  // if (msg.body === '!todos') { // mensionar todos em um grupo
-  //   const chat = await msg.getChat();
-  //   let text = "teste";
-  //   let mentions = [];
-  //   for (let participant of chat.participants) {
-  //     const contact = await client.getContactById(participant.id._serialized);
-  //     mentions.push(contact);
-  //     text += `@${participant.id.user} `;
-  //   }
-  //   await chat.sendMessage(text, { mentions });
-  // }
-});
-
-client.initialize();
