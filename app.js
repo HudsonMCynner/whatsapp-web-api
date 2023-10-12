@@ -10,7 +10,7 @@ const router = express.Router();
 const index = require('./src/routes');
 const auth = require('./src/routes/AuthRoute');
 const osRoute = require('./src/routes/OsUtilRouter');
-const whatsRoute = require('./src/routes/whatsRoute');
+const whatsRoute = require('./src/routes/WhatsRoute');
 
 app.use('/', index);
 app.use('/auth', auth);

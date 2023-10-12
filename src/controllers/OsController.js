@@ -1,6 +1,6 @@
-var osu = require('node-os-utils')
-var cpu = osu.cpu
-var mem = osu.mem
+const osu = require('node-os-utils')
+const cpu = osu.cpu
+const mem = osu.mem
 
 exports.cpuUsage = (req, res, next) => {
   cpu.usage()

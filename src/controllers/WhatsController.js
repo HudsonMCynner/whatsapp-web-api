@@ -59,15 +59,29 @@ exports.inicializar = () => {
 }
 
 exports.enviarMensagem = (req, res, next) => {
-  const { numeros, mensagem } = req.body
+  const imagem = req.files; // A imagem está disponível em req.file
+  let { jsonData } =  req.body; // O JSON enviado está disponível em req.body
 
-  if (Array.isArray(numeros)) {
-    numeros.forEach((numero) => {
-      numero = numero.includes('@c.us') ? numero : `${numero}@c.us`;
-      enviarMensagem(numero, mensagem)
-    })
-    res.status(200).send();
+  if (jsonData) {
+    jsonData = JSON.parse(jsonData)
   }
+
+  if (!imagem || !jsonData) {
+    return res.status(400).json({ message: 'Imagem e/ou JSON não fornecidos' });
+  }
+
+  if (imagem) {
+    const imagemBase64 = imagem.buffer.toString('base64');
+    console.log(imagemBase64)
+  }
+
+  // if (Array.isArray(numeros)) {
+  //   numeros.forEach((numero) => {
+  //     numero = numero.includes('@c.us') ? numero : `${numero}@c.us`;
+  //     enviarMensagem(numero, mensagem)
+  //   })
+  //   res.status(200).send();
+  // }
 }
 
 exports.buscarContatos = (req, res, next) => {
